@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev-shared": "vite --host",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
+    "dev-shared": "vite --host",
     "package": "vue-tsc && vite build --outDir ../mrmat_xmas_2024/static/ --emptyOutDir"
   },
   "dependencies": {
