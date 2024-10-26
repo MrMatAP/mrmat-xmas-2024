@@ -1,4 +1,8 @@
 import importlib.metadata
+import fastapi
+import fastapi.middleware.cors
+
+import mrmat_xmas_2024.model
 
 try:
     __version__ = importlib.metadata.version('mrmat-xmas-2024')
@@ -7,3 +11,4 @@ except importlib.metadata.PackageNotFoundError:
     # interactively working on it
     __version__ = '0.0.0.dev0'
 
+__version_header__ = 'X-Version'
