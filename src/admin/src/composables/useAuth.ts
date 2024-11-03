@@ -3,6 +3,7 @@ import { PublicClientApplication, type AccountInfo, type RedirectRequest } from 
 
 export const msalConfig = {
     auth: {
+        tenantId: import.meta.env.VITE_TENANT_ID,
         clientId: import.meta.env.VITE_CLIENT_ID,
         authority: import.meta.env.VITE_AUTHORITY,
         redirectUri: import.meta.env.VITE_REDIRECT_URI,
@@ -14,7 +15,7 @@ export const msalConfig = {
     }
 }
 export const graphScopes: RedirectRequest = {
-    scopes: ['user.read', 'openid', 'profile']
+    scopes: ['user.read', 'openid', 'profile'],
 }
 export const state = reactive({
     isAuthenticated: false,
@@ -30,10 +31,10 @@ export function useAuth() {
             if(! myMSALObj) {
                 throw new Error('MSAL not initialised')
             }
-            await myMSALObj.loginRedirect()
+            await myMSALObj.loginRedirect(graphScopes)
             isAuthenticated.value = true
 
-            const loginResponse = await myMSALObj.loginRedirect()
+            const loginResponse = await myMSALObj.loginRedirect(graphScopes)
             isAuthenticated.value = true
             console.log('Login success:', loginResponse)
         } catch(error) {
