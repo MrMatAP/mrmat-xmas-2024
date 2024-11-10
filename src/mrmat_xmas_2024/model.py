@@ -1,3 +1,4 @@
+import typing
 import pydantic
 
 class XmasException(Exception):
@@ -10,3 +11,17 @@ class XmasException(Exception):
 class StatusResponse(pydantic.BaseModel):
     status: int
     msg: str
+
+
+class XMasFeedback(pydantic.BaseModel):
+    year: int
+    hasPicture: bool
+    message: str
+
+
+class XMasPerson(pydantic.BaseModel):
+    id: str
+    name: str
+    language: str
+    greeting: str
+    feedback: typing.List[XMasFeedback] = pydantic.Field(default_factory=list)

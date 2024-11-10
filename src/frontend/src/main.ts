@@ -1,5 +1,11 @@
 import { createApp } from 'vue'
-import './style.css'
+import router from "./router";
+import { i18n } from './i18n.ts';
+import './style.scss'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+app
+    .use(router)
+    .use(i18n)
+    .mount('#app')

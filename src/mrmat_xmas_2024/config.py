@@ -24,6 +24,12 @@ class Config:
     testclient_client_id: str = dataclasses.field(default=os.getenv('TESTCLIENT_CLIENT_ID'))
     testclient_client_secret: str = os.getenv('TESTCLIENT_CLIENT_SECRET')
 
+    cosmos_url: str = dataclasses.field(default=os.getenv('COSMOS_URL'))
+    cosmos_db: str = dataclasses.field(default=os.getenv('COSMOS_DB'))
+    cosmos_container: str = dataclasses.field(default=os.getenv('COSMOS_CONTAINER'))
+    storage_url: str = dataclasses.field(default=os.getenv('STORAGE_ACCOUNT_URL'))
+    storage_container: str = dataclasses.field(default=os.getenv('STORAGE_CONTAINER'))
+
     def __init__(self, config_file: pathlib.Path | None = None):
         self._logger = logging.getLogger(f"{self.__class__.__module__}.{self.__class__.__name__}")
         if config_file:
