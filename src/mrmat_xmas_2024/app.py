@@ -1,8 +1,11 @@
 import typing
+import os
+import pathlib
 import contextlib
 
 import fastapi
 import fastapi.middleware.cors
+import fastapi.staticfiles
 import azure.identity
 import pydantic
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
@@ -64,7 +67,7 @@ app.add_middleware(
     fastapi.middleware.cors.CORSMiddleware,
     allow_origins=['https://mrmat-xmas.azurewebsites.net', 'http://localhost:8000', 'http://localhost:5173'],
     allow_credentials=True,
-    allow_methods=['*', 'DELETE'],
+    allow_methods=['GET', 'POST', 'OPTIONS'],
     allow_headers=['*'],
 )
 
@@ -154,3 +157,24 @@ async def picture_update(caller: typing.Annotated[XMasPerson, fastapi.Depends(va
         caller.feedback.append(XMasFeedback(hasPicture=True))
     updated_person = cosmos_container_client.upsert_item(body=caller.model_dump())
     return XMas2024Person.from_xmas_person(XMasPerson.model_validate(updated_person))
+
+class SPAStaticFilesWithFallback(fastapi.staticfiles.StaticFiles):
+    """
+    An override for static files to fall back to the index if the relative path has not been found.
+    This permits us to serve an SPA from a single webapp.
+    """
+
+    def __init__(self, directory: os.PathLike, index='index.html'):
+        self.index = index
+        super().__init__(directory=directory, html=True, check_dir=True)
+
+    def lookup_path(self, path: str) -> typing.Tuple[str, typing.Optional[os.stat_result]]:
+        full_path, stat_result = super().lookup_path(path)
+        if not stat_result:
+            return super().lookup_path(self.index)
+        return full_path, stat_result
+
+
+app.mount(path='/',
+          app=SPAStaticFilesWithFallback(directory=pathlib.Path(os.path.dirname(__file__), 'static')),
+          name='static')

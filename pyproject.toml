@@ -37,7 +37,7 @@ include = ["mrmat_xmas_2024*"]
 namespaces = true
 
 [tool.setuptools.package-data]
-"*" = [".mo", "*.html", "*.png", "*.webmanifest", "*.ico", "*.css", "*.js"]
+"*" = ["*.html", "*.png", "*.webmanifest", "*.ico", "*.css", "*.js"]
 
 # If you are debugging your tests using PyCharm then comment out the coverage options
 # in addopts

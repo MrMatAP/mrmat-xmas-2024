@@ -1,28 +1,37 @@
 <script setup lang="ts">
-import { computed, ref, Ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from "../composables/useStore.ts"
 
-const { person, pictureUrl, updateUser, updatePicture } = useStore()
+const $router = useRouter()
+const { appState, person, pictureUrl, getUser, updateUser, updatePicture } = useStore()
 
 const fileSelector = ref()
 const uploading = ref(false);
 
-function onSend() {
+async function onSend() {
   uploading.value = true;
-  updateUser()
-      .then( () => uploading.value = false )
+  await updateUser();
+  uploading.value = false;
 }
 
 function onSelectPicture() {
   fileSelector.value.click();
 }
 
-function onPictureSelected() {
+async function onPictureSelected() {
   const localImage = fileSelector.value.files[0]
-  uploading.value = true
-  updatePicture(localImage)
-      .then( () => uploading.value = false )
+  uploading.value = true;
+  await updatePicture(localImage);
+  uploading.value = false;
 }
+
+onMounted( async () => {
+  appState.isLoading = true;
+  await getUser(undefined);
+  if(person.value.id == "0") await $router.push({name: 'Stranger'});
+  appState.isLoading = false;
+})
 </script>
 
 <template>
