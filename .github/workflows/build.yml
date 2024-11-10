@@ -1,0 +1,131 @@
+#
+# How to build this
+
+name: Build
+
+#
+# Operational Variables
+
+env:
+  MAJOR: 1
+  MINOR: 1
+  PYTHON_VERSION: 3.12.0
+  NODE_VERSION: 20.5.1
+
+#
+# Establish when the workflow is run
+# We do build on every push except when we push onto main (which is subject to branch protection)
+# We do build whenever a PR onto main is closed (see on) and the code is actually merged (see release job if)
+# Why is that okay?
+# Since we're making a PR, we know from the previous workflow run on push that the repo is okay and the PR
+# shows that to us. A PR itself doesn't cause a build, except when it is closed and the changes were merged.
+
+on:
+  push:
+    branches-ignore:
+    - main
+  pull_request_target:
+    branches:
+    - main
+    types:
+    - closed
+
+#
+# Workflow
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout out our code
+      uses: actions/checkout@v4
+
+    - name: Calculate Build Context
+      run: |
+        MRMAT_VERSION="${MAJOR}.${MINOR}.${GITHUB_RUN_NUMBER}"
+        if [ "$GITHUB_EVENT_NAME" == 'pull_request_target' -a "$GITHUB_BASE_REF" == 'main' ]; then
+          MRMAT_IS_RELEASE=true
+          echo "::warning ::Building release ${MRMAT_VERSION}"
+          echo "MRMAT_IS_RELEASE=true" >> $GITHUB_ENV
+        else
+          MRMAT_VERSION="${MRMAT_VERSION}.dev0"
+          echo "::warning ::Building version ${MRMAT_VERSION}"
+        fi
+        echo "MRMAT_VERSION=${MRMAT_VERSION}" >> $GITHUB_ENV
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Set up Node ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Establish a cache for dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}
+
+    - name: Build
+      run: |
+        cd ${GITHUB_WORKSPACE}/src/frontend
+        npm install
+        npm run package
+
+        cd ${GITHUB_WORKSPACE}/
+        pip install --user -r requirements.dev.txt
+        python -m build --wheel -n
+        cd ${GITHUB_WORKSPACE}/dist
+        zip -r ${GITHUB_WORKSPACE}/backend.zip .
+
+    - name: Upload backend artefact for deployment jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-app
+        path: backend.zip
+
+    - name: Conditional Release
+      uses: marvinpinto/action-automatic-releases@latest
+      if: (github.event.pull_request.merged == true && github.base_ref == 'main')
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "${{ env.MRMAT_VERSION }}"
+        prerelease: false
+        title: "Release ${{ env.MRMAT_VERSION }}"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write
+    steps:
+    - name: Download artifacts from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: backend
+
+    - name: Unzip artifact for deployment
+      run: unzip backend.zip
+
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.__clientidsecretname__ }}
+        tenant-id: ${{ secrets.__tenantidsecretname__ }}
+        subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
+
+    - name: Conditional Deploy
+      uses: azure/webapps-deploy@v3
+      if: (github.event.pull_request.merged == true && github.base_ref == 'main')
+      id: deploy-to-backend
+      with:
+        app-name: 'mrmat-xmas'
+        slot-name: 'production'
