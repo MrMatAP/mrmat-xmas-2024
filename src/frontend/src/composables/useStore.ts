@@ -1,23 +1,21 @@
-import {reactive, ref, Ref} from 'vue';
+import {reactive, ref, Ref, readonly} from 'vue';
 import {mande} from "mande";
 
-export class XMasFeedback {
-    year: number = 2024
-    hasPicture: boolean = false
-    message: string = ""
-}
-
-export class XMasPerson {
+export class XMas2024Person {
     id: string = "0"
     name: string = "Stranger"
     language: string = "en"
     greeting: string = "Hello Stranger"
-    feedback: XMasFeedback[] = []
+    hasPicture: boolean = false;
+    message: string = ""
 }
 
-export class StatusResponse{
-    status: number = -1
-    msg: string
+export class XMas2024Feedback {
+    message: string
+
+    constructor(message: string) {
+        this.message = message
+    }
 }
 
 export const appState = reactive({
@@ -27,29 +25,28 @@ export const appState = reactive({
     errorMessageId: 'unknown'
 })
 
-export const xmasPerson: Ref<XMasPerson> = ref(new XMasPerson());
+export const xmasPerson: Ref<XMas2024Person> = ref(new XMas2024Person());
+export const xmasPicture: Ref<string> = ref('/tap-to-update.png')
 
 export function useStore() {
 
-    const api = mande('/api/xmaspeople')
+    const api = mande('/api/people')
 
-    const initialise = async (uid?: string) => {
+    const getUser = async (uid?: string) => {
         const localUid = window.localStorage.getItem("mrmat-xmas-2024");
         let queryUid = uid || localUid
         if( ! queryUid ) return
-        xmasPerson.value = await api.get<XMasPerson>(queryUid);
-        if( xmasPerson.value.id !== "0") {
+        xmasPerson.value = await api.get<XMas2024Person>(queryUid);
+        if(xmasPerson.value.id !== "0")
             window.localStorage.setItem("mrmat-xmas-2024", xmasPerson.value.id);
-        }
+        if(xmasPerson.value.hasPicture)
+            xmasPicture.value = `/api/pictures/${xmasPerson.value.id}?t=${Date.now()}`
     }
 
-    const updateFeedback = async (message: string) => {
-        let feedback = new XMasFeedback()
-        let feedback2024 = identity.value.feedback.filter( (f) => f.year == 2024)
-        if(feedback2024.length != 0) feedback = feedback2024[0]
-        feedback.message = message
-        feedback.hasPicture = hasPicture
-        xmasPerson.value = await api.post<XMasPerson>(xmasPerson.value.id, feedback)
+    const updateUser = async () => {
+        xmasPerson.value = await api.post<XMas2024Person>(
+            xmasPerson.value.id,
+            new XMas2024Feedback(xmasPerson.value.message))
     }
 
     const updatePicture = async (localImage: File) => {
@@ -60,16 +57,17 @@ export function useStore() {
             body: formData})
             .then( (response) => response.json() )
             .then( (response) => {
-                console.dir(response)
-                xmasPerson.value = response
+                xmasPerson.value = response as XMas2024Person;
+                xmasPicture.value = `/api/pictures/${xmasPerson.value.id}?t=${Date.now()}`
             })
     }
 
     return {
             appState,
-            identity: xmasPerson,
-            initialise,
-            updateFeedback,
+            person: xmasPerson,
+            pictureUrl: readonly<string>(xmasPicture),
+            getUser,
+            updateUser,
             updatePicture
     }
 }

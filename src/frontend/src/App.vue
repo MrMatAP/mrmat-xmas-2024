@@ -7,13 +7,13 @@ import AppError from "./components/AppError.vue";
 
 const $router = useRouter()
 const $route = useRoute()
-const { initialise, appState, identity } = useStore()
+const { getUser, appState, person } = useStore()
 
 onMounted(async () => {
   appState.isLoading = true;
   const uid = $route.params.uid
-  await initialise(uid);
-  if(identity.value.id !== "0") {
+  await getUser(uid);
+  if(person.value.id !== "0") {
     await $router.push({name: 'Identified'})
   } else {
     await $router.push({ name: 'Stranger'})
@@ -27,6 +27,3 @@ onMounted(async () => {
   <AppLoading/>
   <AppError/>
 </template>
-
-<style scoped>
-</style>

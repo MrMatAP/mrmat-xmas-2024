@@ -102,6 +102,17 @@ body {
   margin-top: 0;
 }
 
+.imagePlaceholder {
+  max-width: 80%;
+  cursor: pointer;
+}
+
+.imagePlaceholder img {
+  max-width: 80%;
+  min-height: 430px;
+  max-height: 430px;
+}
+
 textarea {
   width: 60%;
   height: 8rem;

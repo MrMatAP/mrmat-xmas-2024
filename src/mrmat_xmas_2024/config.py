@@ -10,7 +10,7 @@ except ImportError:
     from yaml import Loader, Dumper
 
 from mrmat_xmas_2024 import __default_config_file__
-from mrmat_xmas_2024.model import XmasException
+from mrmat_xmas_2024.model import XMasException
 
 @dataclasses.dataclass(init=False)
 class Config:
@@ -58,4 +58,4 @@ class Config:
                     setattr(self, key, value)
                 self._logger.debug(f"Config file overrides {key} with value {value}")
         except yaml.YAMLError as ye:
-            raise XmasException(code=400, msg='Invalid config file') from ye
+            raise XMasException(code=400, msg='Invalid config file') from ye
