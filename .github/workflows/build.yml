@@ -80,6 +80,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/
         pip install --user -r requirements.dev.txt
         python -m build --wheel -n
+        cp -R ${GITHUB_WORKSPACE}/var/azure-webapp/backend/* ${GITHUB_WORKSPACE}/dist/
         cd ${GITHUB_WORKSPACE}/dist
         zip -r ${GITHUB_WORKSPACE}/backend.zip .
 

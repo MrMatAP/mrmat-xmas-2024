@@ -9,7 +9,6 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-from mrmat_xmas_2024 import __default_config_file__
 from mrmat_xmas_2024.model import XMasException
 
 @dataclasses.dataclass(init=False)
@@ -17,13 +16,6 @@ class Config:
     """
     Configuration handling for mrmat-xmas-2024
     """
-    tenant_id: str = dataclasses.field(default=os.getenv('AZURE_TENANT_ID'))
-    backend_client_id: str = dataclasses.field(default=os.getenv('AZURE_CLIENT_ID'))
-    backend_client_secret: str = dataclasses.field(default=os.getenv('AZURE_CLIENT_SECRET'))
-    openapi_client_id: str = dataclasses.field(default=os.getenv('OPENAPI_CLIENT_ID'))
-    testclient_client_id: str = dataclasses.field(default=os.getenv('TESTCLIENT_CLIENT_ID'))
-    testclient_client_secret: str = os.getenv('TESTCLIENT_CLIENT_SECRET')
-
     cosmos_url: str = dataclasses.field(default=os.getenv('COSMOS_URL'))
     cosmos_db: str = dataclasses.field(default=os.getenv('COSMOS_DB'))
     cosmos_container: str = dataclasses.field(default=os.getenv('COSMOS_CONTAINER'))

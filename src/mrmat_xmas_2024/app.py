@@ -8,7 +8,6 @@ import fastapi.middleware.cors
 import fastapi.staticfiles
 import azure.identity
 import pydantic
-from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
 import azure.cosmos
 import azure.cosmos.exceptions
 import azure.storage.blob
@@ -23,10 +22,6 @@ from mrmat_xmas_2024.model import (
 
 config = Config(__default_config_file__)
 app_credential = azure.identity.DefaultAzureCredential()
-azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
-    tenant_id=config.tenant_id,
-    app_client_id = config.backend_client_id,
-    scopes={f'api://{config.backend_client_id}/user_impersonation': 'user_impersonation'})
 cosmos_client: azure.cosmos.CosmosClient = azure.cosmos.CosmosClient(
     url=config.cosmos_url,
     credential=app_credential)
@@ -46,7 +41,6 @@ known_uids: typing.List[str] = []
 
 @contextlib.asynccontextmanager
 async def lifespan(app: fastapi.FastAPI) -> typing.AsyncGenerator[None, None]:
-    await azure_scheme.openid_config.load_config()
     raw_uids: typing.List[typing.Dict[str, str]] = cosmos_container_client.query_items(
         query='SELECT c.id FROM c WHERE c.eligibleForCurrentYear = true',
         enable_cross_partition_query=True)
@@ -55,12 +49,6 @@ async def lifespan(app: fastapi.FastAPI) -> typing.AsyncGenerator[None, None]:
     yield
 
 app = fastapi.FastAPI(
-    swagger_ui_oauth2_redirect_url='/oauth2-redirect',
-    swagger_ui_init_oauth={
-        'usePkceWithAuthorizationCodeGrant': True,
-        'clientId': config.backend_client_id,
-        'scopes': f'api://{config.backend_client_id}/user_impersonation'
-    },
     lifespan=lifespan
 )
 app.add_middleware(
