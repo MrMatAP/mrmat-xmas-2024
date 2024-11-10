@@ -21,5 +21,6 @@
   flex: 2 80vw;
   height: 100vh;
   overflow: auto;
+  padding-left: 1rem;
 }
 </style>
