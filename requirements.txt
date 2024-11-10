@@ -4,6 +4,7 @@ uvicorn==0.32.0
 fastapi==0.115.3
 pyyaml==6.0.2
 rich==13.9.3
+azure-identity==1.19.0
 azure-cosmos==4.7.0
 azure-storage-blob==12.23.1
 python-multipart==0.0.17
