@@ -51,7 +51,7 @@ export function useStore() {
             body: JSON.stringify(new XMas2024Feedback(xmasPerson.value.message))})
         if(response.status !== 200) {
             appState.isError = true;
-            // TODO: Set error message id
+            appState.errorMessageId = 'badResponse'
             return
         }
         xmasPerson.value = await response.json() as XMas2024Person;
@@ -65,7 +65,7 @@ export function useStore() {
             body: formData})
         if(response.status !== 200) {
             appState.isError = true;
-            // TODO: Set error message id
+            appState.errorMessageId = 'badResponse'
             return
         }
         xmasPerson.value = await response.json() as XMas2024Person;
