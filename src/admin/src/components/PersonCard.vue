@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { XMasFeedback, XMasPerson } from "../stores/useXmasStore.ts"
 import { useBlob } from "../composables/useBlob.ts"
 
@@ -11,17 +12,38 @@ defineEmits<{
 
 const { blob } = useBlob();
 
-function pictureSrcForYear(year: number) {
+async function blobToDataUrl(blob: Blob) {
+  const fileReader = new FileReader();
+  return new Promise<string>((resolve, reject) => {
+    fileReader.onloadend = (ev: any) => {
+      resolve(ev.target!.result);
+    };
+    fileReader.onerror = reject;
+    fileReader.readAsDataURL(blob);
+  });
+}
+
+async function pictureSrcForYear(year: number) {
   const feedbacks = person.feedback.filter( (f: XMasFeedback) => f.year == year);
   if(feedbacks.length == 0 || ! feedbacks[0].hasPicture) return { src: '/no-image.png', label: 'No image was uploaded' }
-  const blobClient = blob.containerClient?.getBlobClient(person.id)
+  const blobClient = blob.containerClient?.getBlobClient(`${year}/${person.id}`)
   if(blobClient === undefined) throw Error("Failed to create blob client")
+  // const downloadBlockBlobResponse = await blobClient.download();
+  // const downloaded = await blobToDataUrl(await downloadBlockBlobResponse.blobBoby);
   return { src: blobClient.url, label: '' }
 }
 
 function toString(num: number): string {
   return String(num)
 }
+
+onMounted(() => {
+  new QRCode(document.getElementById(`qrcode_${person.id}`), {
+    text: `https://mrmat-xmas.azurewebsites.net/${person.id}`,
+    width: 256,
+    height: 256,
+  });
+})
 </script>
 
 <template>
@@ -32,6 +54,7 @@ function toString(num: number): string {
         <q-card-section class="q-pt-xs idSection">
           <div class="text-overline">{{ person.id }}</div>
           <div class="text-h5 q-mt-sm q-mb-xs">{{ person.name }}</div>
+          <div :id="`qrcode_${person.id}`"></div>
         </q-card-section>
         <q-separator vertical/>
         <q-card-section class="q-pt-xs configSection">
