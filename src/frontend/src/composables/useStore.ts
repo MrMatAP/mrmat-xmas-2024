@@ -1,4 +1,7 @@
 import {reactive, ref, Ref, readonly} from 'vue';
+import { useAppInsights } from "./useAppInsights.ts";
+
+const { appInsights } = useAppInsights()
 
 export class XMas2024Person {
     id: string = "0"
@@ -36,6 +39,12 @@ export function useStore() {
         let response = await fetch(`/api/people/${queryUid}`)
         if(response.status !== 200) {
             xmasPerson.value = new XMas2024Person()
+            appInsights.value.trackEvent({
+                name: 'getUserUnknown',
+                properties: {
+                    code: response.status
+                }
+            })
             return
         }
         xmasPerson.value = await response.json();
@@ -52,6 +61,14 @@ export function useStore() {
         if(response.status !== 200) {
             appState.isError = true;
             appState.errorMessageId = 'badResponse'
+            appInsights.value.trackEvent({
+                name: 'updateUserException',
+                properties: {
+                    code: response.status,
+                    person_id: xmasPerson.value.id,
+                    person_name: xmasPerson.value.name
+                }
+            })
             return
         }
         xmasPerson.value = await response.json() as XMas2024Person;
@@ -66,6 +83,14 @@ export function useStore() {
         if(response.status !== 200) {
             appState.isError = true;
             appState.errorMessageId = 'badResponse'
+            appInsights.value.trackEvent({
+                name: 'updateUserException',
+                properties: {
+                    code: response.status,
+                    person_id: xmasPerson.value.id,
+                    person_name: xmasPerson.value.name
+                }
+            })
             return
         }
         xmasPerson.value = await response.json() as XMas2024Person;

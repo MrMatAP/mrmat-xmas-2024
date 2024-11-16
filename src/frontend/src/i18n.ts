@@ -16,7 +16,7 @@ export const i18n = createI18n({
                 'climate). The silicone mould I\'m sending along is good for temperatures between ' +
                 '-60C to 230C and it does get along with dishwashers. I\'m afraid I can give you ' +
                 'just one of these tree-shaped moulds, so take the opportunity to make some ' +
-                'cookies as well.',
+                'cookies too.',
             main_challenge_2: 'Send me a note and a picture of yourself enjoying the results.',
             feedback_your_message: 'Your note to me',
             feedback_send: 'Send'

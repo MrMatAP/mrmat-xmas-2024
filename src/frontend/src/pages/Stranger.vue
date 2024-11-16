@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useAppInsights } from "../composables/useAppInsights.ts";
 import { useStore } from "../composables/useStore.ts"
 
+const { appInsights } = useAppInsights()
 const { appState } = useStore()
 
 onMounted(() => {
+  appInsights.value.setAuthenticatedUserContext('stranger', 'stranger');
+  appInsights.value.trackPageView({ name: 'stranger' })
   appState.isLoading = false
 })
 </script>

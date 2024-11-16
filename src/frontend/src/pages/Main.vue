@@ -2,24 +2,40 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useAppInsights } from "../composables/useAppInsights.ts";
 import { useStore } from "../composables/useStore.ts"
 
 const $router = useRouter()
 const { locale } = useI18n({ useScope: 'global' })
+const { appInsights } = useAppInsights();
 const { appState, person, pictureUrl, getUser, updateUser, updatePicture } = useStore()
 
 const fileSelector = ref()
 const imageLoading = ref(true);
 const busy = ref(false);
 
-async function onSend() {
+async function onSendMessage() {
   busy.value = true;
   await updateUser();
   busy.value = false;
+  appInsights.value.trackEvent({
+    name: 'onSendMessage',
+    properties: {
+      person_id: person.value.id,
+      person_name: person.value.name
+    }
+  })
 }
 
 function onSelectPicture() {
   fileSelector.value.click();
+  appInsights.value.trackEvent({
+    name: 'onSelectPicture',
+    properties: {
+      person_id: person.value.id,
+      person_name: person.value.name
+    }
+  })
 }
 
 async function onPictureSelected() {
@@ -29,12 +45,30 @@ async function onPictureSelected() {
   await updatePicture(localImage);
   imageLoading.value = false;
   busy.value = false;
+  appInsights.value.trackEvent({
+    name: 'onPictureSelected',
+    properties: {
+      person_id: person.value.id,
+      person_name: person.value.name
+    }
+  })
 }
 
 onMounted( async () => {
   appState.isLoading = true;
   await getUser(undefined);
   if(person.value.id == "0") await $router.push({name: 'Stranger'});
+  appInsights.value.setAuthenticatedUserContext(
+      person.value.id,
+      person.value.name,
+      true)
+  appInsights.value.trackPageView({
+    name: 'main',
+    properties: {
+      person_id: person.value.id,
+      person_name: person.value.name
+    }
+  })
   locale.value = person.value.language;
 
   // Preload the image
@@ -55,7 +89,7 @@ onMounted( async () => {
 
   <div class="imageContainer centeredContainer">
     <img v-if="!imageLoading" :src="pictureUrl" alt="Your image" @click="onSelectPicture">
-    <div v-else="imageBusy" class="pleaseWait">
+    <div v-else class="pleaseWait">
       <div class="loader"/>
     </div>
   </div>
@@ -68,7 +102,7 @@ onMounted( async () => {
   </div>
   <div class="rightContainer">
     <input ref="fileSelector" type="file" @change.prevent="onPictureSelected" style="display: none"/>
-    <button @click.prevent="onSend" :disabled="busy">{{ $t('feedback_send')}}</button>
+    <button @click.prevent="onSendMessage" :disabled="busy">{{ $t('feedback_send')}}</button>
   </div>
 </template>
 
