@@ -95,7 +95,7 @@ jobs:
 
     - name: Conditional Deploy
       uses: azure/webapps-deploy@v3
-      #if: (github.event.pull_request.merged == true && github.base_ref == 'main')
+      if: (github.event.pull_request.merged == true && github.base_ref == 'main')
       id: deploy-to-backend
       with:
         app-name: mrmat-xmas
