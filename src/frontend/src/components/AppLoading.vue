@@ -9,3 +9,6 @@ const { appState } = useStore()
     <div class="loader"></div>
   </div>
 </template>
+
+<style scoped>
+</style>

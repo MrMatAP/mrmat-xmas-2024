@@ -1,8 +1,4 @@
-$primary    : #202e32;
-$secondary  : #85937a;
-$ternary    : #586c5c;
-$fourth     : #a9af90;
-$accent     : #dfdcb9;
+@import url(colours.css);
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -10,8 +6,8 @@ $accent     : #dfdcb9;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: $accent;
-  background-color: $primary;
+  color: var(--accent);
+  background-color: var(--primary);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -26,17 +22,17 @@ body {
 }
 
 #app {
-  padding-right: 1rem;
+  padding: 1rem;
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   align-items: normal;
   justify-content: left;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: $accent;
-    background-color: $primary;
+    color: var(--accent);
+    background-color: var(--primary);
   }
 }
 
@@ -63,8 +59,8 @@ body {
 }
 
 .loader {
-  border: 16px solid $accent;
-  border-top: 16px solid $primary;
+  border: 16px solid var(--accent);
+  border-top: 16px solid var(--primary);
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -83,55 +79,31 @@ body {
   justify-content: flex-start;
   align-items: flex-start;
   z-index: 101;
-  background-color: $ternary;
+  background-color: var(--ternary);
   min-width: 80vh;
-  border: 1px solid $accent;
+  border: 1px solid var(--accent);
   padding: 10px;
 }
 
 .errorMessage h1 {
   font-size: 2rem;
   font-weight: bold;
-  color: $accent;
+  color: var(--accent);
   margin-bottom: 0;
 }
 
 .errorMessage p {
   font-size: 1rem;
-  color: $accent;
+  color: var(--accent);
   margin-top: 0;
 }
 
-.imagePlaceholder {
-  max-width: 80%;
-  cursor: pointer;
+.centeredContainer {
+  display: flex;
+  justify-content: center;
 }
 
-.imagePlaceholder img {
-  max-width: 80%;
-  min-height: 430px;
-  max-height: 430px;
-}
-
-textarea {
-  width: 60%;
-  height: 8rem;
-  background-color: $secondary;
-  color: $primary;
-  padding: 1rem;
-  border: 1px solid $accent;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  resize: vertical;
-}
-
-textarea:focus {
-  border: 1px solid $accent;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  background-color: $secondary;
-  color: $primary;
-  font-weight: bold;
+.rightContainer {
+  display: flex;
+  justify-content: end;
 }
