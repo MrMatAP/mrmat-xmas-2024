@@ -19,21 +19,23 @@ export const i18n = createI18n({
                 'cookies too.',
             main_challenge_2: 'Send me a note and a picture of yourself enjoying the results.',
             feedback_your_message: 'Your note to me',
-            feedback_send: 'Send'
+            feedback_send: 'Send',
+            feedback_sent: 'Sent!'
         },
         de: {
             errorHeader: 'Alles ist gut... oder eben auch nicht',
             errorMessages: {
                 unknown: 'Da ist etwas passiert aber wir wissen nicht so genau was es war. Probiers später nochmal.'
             },
-            main_challenge_1: 'Dieses Jahr is meine analoge Engineering-Aufgabe fuer Dich, einen ' +
-                'Kuchen zu backen (oder jelly, wenn Du in einer wärmeren Gegend lebst). Die Silikon-Form ' +
+            main_challenge_1: 'Dieses Jahr is meine analoge Engineering-Aufgabe für euch einen ' +
+                'Kuchen zu backen (oder Jelly, wenn ihr in einer wärmeren Gegend lebt). Die Silikon-Form ' +
                 'ist für Temperaturen zwischen -60C und 230C gemacht und kommt auch mit Geschirrspülern klar. ' +
-                'Ich kann Dir nur eine Form geben, nimm die Gelegenheit wahr gleich auch noch ein ' +
+                'Ich kann euch nur eine Form geben, nehmt die Gelegenheit wahr gleich auch noch ein ' +
                 'paar Guetzli zu backen.',
-            main_challenge_2: 'Schick mir eine Notiz mit einem Foto von Dir und dem Resultat.',
-            feedback_your_message: 'Deine Notiz an mich',
-            feedback_send: 'Abschicken'
+            main_challenge_2: 'Schickt mir eine Notiz mit einem Foto von euch und dem Resultat.',
+            feedback_your_message: 'Eure Notiz an mich',
+            feedback_send: 'Abschicken',
+            feedback_sent: 'Nachricht angekommen!'
         }
     }
 })
