@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted, Ref} from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAppInsights } from "../composables/useAppInsights.ts";
@@ -12,11 +12,17 @@ const { appState, person, pictureUrl, getUser, updateUser, updatePicture } = use
 
 const fileSelector = ref()
 const imageLoading = ref(true);
-const busy = ref(false);
+const busy: Ref<boolean> = ref(false);
+const messageChanged: Ref<boolean> = ref(false)
+
+function onChangeMessage() {
+  messageChanged.value = true;
+}
 
 async function onSendMessage() {
   busy.value = true;
   await updateUser();
+  messageChanged.value = false;
   busy.value = false;
   appInsights.value.trackEvent({
     name: 'onSendMessage',
@@ -70,6 +76,7 @@ onMounted( async () => {
     }
   })
   locale.value = person.value.language;
+  if(person.value.message === "") messageChanged.value = true;
 
   // Preload the image
   let img = new Image();
@@ -95,6 +102,7 @@ onMounted( async () => {
   </div>
   <div class="textContainer">
     <textarea v-model="person.message"
+              @change.prevent="onChangeMessage"
               autofocus
               maxlength="1600"
               :placeholder="$t('feedback_your_message')">
@@ -102,7 +110,7 @@ onMounted( async () => {
   </div>
   <div class="rightContainer">
     <input ref="fileSelector" type="file" @change.prevent="onPictureSelected" style="display: none"/>
-    <button @click.prevent="onSendMessage" :disabled="busy">{{ $t('feedback_send')}}</button>
+    <button @click.prevent="onSendMessage">{{ messageChanged ? $t('feedback_send') : $t('feedback_sent') }}</button>
   </div>
 </template>
 
