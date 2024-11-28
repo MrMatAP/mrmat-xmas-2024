@@ -107,3 +107,7 @@ body {
   display: flex;
   justify-content: end;
 }
+
+textarea::placeholder{
+  color: var(--ternary);
+}
