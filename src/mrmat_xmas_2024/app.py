@@ -114,7 +114,7 @@ async def user_update(caller: typing.Annotated[XMasPerson, fastapi.Depends(valid
 @app.get('/api/pictures/{uid:str}',
          summary='Get the user picture, if present')
 async def picture_get(caller: typing.Annotated[XMasPerson, fastapi.Depends(validate_user)]) -> fastapi.Response:
-    with container_client.get_blob_client(f'2024/${caller.id}') as blob_client:
+    with container_client.get_blob_client(f'2024/{caller.id}') as blob_client:
         if not blob_client.exists():
             raise fastapi.HTTPException(status_code=404, detail='Sorry, I have no picture for you')
         media = blob_client.get_blob_properties().get('content_settings', {}).get('content_type')
