@@ -131,7 +131,7 @@ async def picture_update(caller: typing.Annotated[XMasPerson, fastapi.Depends(va
                          file: typing.Annotated[fastapi.UploadFile, fastapi.File(description='User picture')]):
     if file.content_type not in __content_type_map__.keys():
         raise fastapi.HTTPException(status_code=400, detail='You must upload a jpeg or png image')
-    with container_client.get_blob_client(f'2024/${caller.id}') as blob_client:
+    with container_client.get_blob_client(f'2024/{caller.id}') as blob_client:
         content = file.file.read()
         blob_client.upload_blob(data=content,
                                 overwrite=True,
