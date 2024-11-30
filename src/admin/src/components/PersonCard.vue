@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { XMasFeedback, XMasPerson } from "../stores/useXmasStore.ts"
-import { useBlob } from "../composables/useBlob.ts"
+import { XMasPerson } from "../stores/useXmasStore.ts"
+import PersonImage from "./PersonImage.vue"
 
 const { person } = defineProps<{
   person: XMasPerson;
@@ -9,29 +9,6 @@ const { person } = defineProps<{
 defineEmits<{
   (e: 'onEdit', id: string): void;
 }>();
-
-const { blob } = useBlob();
-
-async function blobToDataUrl(blob: Blob) {
-  const fileReader = new FileReader();
-  return new Promise<string>((resolve, reject) => {
-    fileReader.onloadend = (ev: any) => {
-      resolve(ev.target!.result);
-    };
-    fileReader.onerror = reject;
-    fileReader.readAsDataURL(blob);
-  });
-}
-
-async function pictureSrcForYear(year: number) {
-  const feedbacks = person.feedback.filter( (f: XMasFeedback) => f.year == year);
-  if(feedbacks.length == 0 || ! feedbacks[0].hasPicture) return { src: '/no-image.png', label: 'No image was uploaded' }
-  const blobClient = blob.containerClient?.getBlobClient(`${year}/${person.id}`)
-  if(blobClient === undefined) throw Error("Failed to create blob client")
-  // const downloadBlockBlobResponse = await blobClient.download();
-  // const downloaded = await blobToDataUrl(await downloadBlockBlobResponse.blobBoby);
-  return { src: blobClient.url, label: '' }
-}
 
 function toString(num: number): string {
   return String(num)
@@ -88,20 +65,7 @@ onMounted(() => {
               expand-separator
               default-opened
               style="min-width: 100%">
-              <q-card>
-                <q-card-section>
-                  <div class="text-caption">{{ feedback.message }}</div>
-                  <div>
-                    <q-img :src="pictureSrcForYear(feedback.year).src">
-                      <template v-slot:error>
-                        <div class="absolute-full flex flex-center bg-secondary text-white">
-                          {{ pictureSrcForYear(feedback.year).label }}
-                        </div>
-                      </template>
-                    </q-img>
-                  </div>
-                </q-card-section>
-              </q-card>
+              <PersonImage :uid="person.id" :feedback="feedback"/>
             </q-expansion-item>
           </q-list>
         </q-card-section>
